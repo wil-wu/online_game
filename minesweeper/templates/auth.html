@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}登录/注册{% endblock %}
+{% block main %}
+  <main style="width: 50%">
+    <h2>欢迎</h2>
+    <ul class="nav nav-tabs nav-justified mb-3" id="auth-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" id="login-tab" data-mdb-toggle="tab" href="#login-tab-pane">登录</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="register-tab" data-mdb-toggle="tab" href="#register-tab-pane">注册</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="auth-content">
+      <div class="tab-pane fade show active" id="login-tab-pane">
+        <form class="needs-validation g-3" data-action="login" novalidate>
+          <div class="form-outline mb-4">
+            <input type="text" id="username1" class="form-control" name="username" minlength="3" maxlength="20"
+                   required/>
+            <label class="form-label" for="username1">用户名</label>
+            <div class="invalid-feedback">用户名长度大于3小于20</div>
+          </div>
+          <div class="form-outline mb-4">
+            <input type="password" id="password1" class="form-control" name="password" minlength="6" maxlength="20"
+                   required/>
+            <label class="form-label" for="password1">密码</label>
+            <div class="invalid-feedback">密码长度大于6小于20</div>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe" checked/>
+            <label class="form-check-label" for="rememberMe">记住我</label>
+          </div>
+          <button type="button" class="btn btn-primary btn-block mb-4">登录</button>
+        </form>
+      </div>
+      <div class="tab-pane fade" id="register-tab-pane">
+        <form class="needs-validation g-3" data-action="register" novalidate>
+          <div class="form-outline mb-4">
+            <input type="text" id="username2" class="form-control" name="username" minlength="3" maxlength="20"
+                   required/>
+            <label class="form-label" for="username2">用户名</label>
+            <div class="invalid-feedback">用户名长度大于3小于20</div>
+          </div>
+          <div class="form-outline mb-4">
+            <input type="password" id="password2" class="form-control" name="password" minlength="6" maxlength="20"
+                   required/>
+            <label class="form-label" for="password2">输入密码</label>
+            <div class="invalid-feedback">密码长度大于6小于20</div>
+          </div>
+          <div class="form-outline mb-4">
+            <input type="password" id="confirm" class="form-control" name="confirm" minlength="6" maxlength="20"
+                   required/>
+            <label class="form-label" for="confirm">重复密码</label>
+            <div class="invalid-feedback">密码长度大于6小于20</div>
+          </div>
+          <button type="button" class="btn btn-primary btn-block mb-4">注册</button>
+        </form>
+      </div>
+    </div>
+  </main>
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

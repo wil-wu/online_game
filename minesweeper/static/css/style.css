@@ -1,0 +1,71 @@
+/* 样式变量 */
+:root {
+    --cell-border-width: 1px;
+    --cell-border-style: solid;
+    --cell-border-color: #B2C8BA;
+    --cell-border: var(--cell-border-width) var(--cell-border-style) var(--cell-border-color);
+    --cell-hide-bg-color: #D2E3C8;
+    --cell-show-bg-color: #EBF3E8;
+}
+
+/* 单元格样式 */
+.cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    border: var(--cell-border);
+}
+
+.cell-hide {
+    background: var(--cell-hide-bg-color);
+}
+
+.cell-show {
+    background: var(--cell-show-bg-color);
+}
+
+.cell-0 {}
+
+.cell-1:before {
+    content: "1";
+}
+
+.cell-2:before {
+    content: "2";
+}
+
+.cell-3:before {
+    content: "3";
+}
+
+.cell-4:before {
+    content: "4";
+}
+
+.cell-5:before {
+    content: "5";
+}
+
+.cell-6:before {
+    content: "6";
+}
+
+.cell-7:before {
+    content: "7";
+}
+
+.cell-8:before {
+    content: "8";
+}
+
+/* 炸弹 */
+.cell-9:before {
+    content: "\f1e2";
+}
+
+/* 旗帜 */
+.cell-10:before{
+    content: "\f024";
+}
