@@ -20,7 +20,10 @@ class RegisterForm(LoginForm):
 
 class SpecForm(FlaskForm):
     """
-    游戏规格表单
+    游戏规格参数
     """
-    width = IntegerField('width', validators=[NumberRange(10, 100)], default=16)
-    height = IntegerField('height', validators=[NumberRange(10, 100)], default=30)
+    class Meta:
+        csrf = False
+
+    width = IntegerField('width', validators=[NumberRange(10, 100)], default=10)
+    height = IntegerField('height', validators=[NumberRange(10, 100)], default=10)

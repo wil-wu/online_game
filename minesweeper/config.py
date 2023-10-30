@@ -5,6 +5,8 @@ class BaseConfig:
     SECRET_KEY = secrets.token_hex()
     INSTANCE_RELATIVE_CONFIG = True
     MINE_RATE = 0.2
+    RANK_LIMIT = 5
+    MAX_PER_PAGE = 10
 
 
 class DevelopmentConfig(BaseConfig):

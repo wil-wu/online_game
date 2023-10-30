@@ -34,6 +34,11 @@
             }
             return cookieValue
         },
+
+        // 移除所有子元素
+        removeChildren(el) {
+            while (el.firstChild) el.removeChild(el.firstChild)
+        }
     }
 
     // 携带csrf_token

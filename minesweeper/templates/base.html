@@ -8,12 +8,12 @@
   {% block styles %}{% endblock %}
 </head>
 <body class="h-100">
-<div class="container h-100 d-flex justify-content-center align-items-center">
+<div class="container-fluid h-100 d-flex justify-content-center align-items-center">
   {% block main %}{% endblock %}
 </div>
 <div class="alert fade alert-warning alert-fixed d-flex align-items-center translate-middle start-50" id="alert"
      style="top: -50%">
-  <i class=""></i>
+  <i class="fa-solid fa-circle-info"></i>
   <div class="ms-2"></div>
 </div>
 <script src="{{ url_for('static', filename='vendor/mdb/mdb.min.js') }}"></script>

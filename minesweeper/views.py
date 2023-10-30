@@ -3,7 +3,6 @@ from flask_wtf.csrf import generate_csrf
 
 from minesweeper.decorators import login_required
 
-
 bp = Blueprint('views', __name__)
 
 

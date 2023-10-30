@@ -1,4 +1,6 @@
 window.addEventListener('DOMContentLoaded', () => {
+    'use strict'
+
     let alert = new mdb.Alert('#alert')
     let loginTab = new mdb.Tab('#login-tab')
     let registerTab = new mdb.Tab('#register-tab')
@@ -11,10 +13,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (res.data.code === 200) {
                     location.href = _urls.game
                 } else {
-                    alert.setType('alert-warning')
-                        .setIcon('fa-solid fa-circle-info')
-                        .setText('')
-                        .show()
+                    let error = Object.values(res.data.data).map(value => value.join(', ')) .join(', ')
+                    alert.setType('alert-warning').setText(error).show()
                 }
             })
         },
@@ -22,11 +22,10 @@ window.addEventListener('DOMContentLoaded', () => {
             request.post(_api.register, data).then((res) => {
                 if (res.data.code === 200) {
                     location.hash = '#login'
+                    alert.setType('alert-success').setText(res.data.msg).show()
                 } else {
-                    alert.setType('alert-warning')
-                        .setIcon('fa-solid fa-circle-info')
-                        .setText('')
-                        .show()
+                    let error = Object.values(res.data.data).map(value => value.join(', ')) .join(', ')
+                    alert.setType('alert-warning').setText(error).show()
                 }
             })
         }
@@ -37,6 +36,9 @@ window.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('hashchange', () => {
         location.hash === '#register' ? registerTab.show() : loginTab.show()
     })
+
+    loginTab._element.addEventListener('click', () => location.hash = '#login')
+    registerTab._element.addEventListener('click', () => location.hash = '#register')
 
 
     // 表单绑定

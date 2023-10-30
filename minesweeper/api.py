@@ -69,8 +69,12 @@ def gen_game_map() -> AjaxData:
     游戏地图
     :return:
     """
-    width = int(request.args.get('width', 16))
-    height = int(request.args.get('height', 16))
+    form = SpecForm(**request.args)
+    if not form.validate():
+        return AjaxData(400, '格式错误', form.errors)
+
+    width = form.data['width']
+    height = form.data['height']
 
     mine_idx = set()
     mine_count = int(width * height * current_app.config['MINE_RATE'])
@@ -82,7 +86,7 @@ def gen_game_map() -> AjaxData:
         # 上，下，左，右
         x = raw_map[r - 1][c] + raw_map[r + 1][c] + raw_map[r][c - 1] + raw_map[r][c + 1]
         # 左上，右上，左下，右下
-        y = raw_map[r - 1][c - 1] + raw_map[r - 1][c + 1] + raw_map[r + 1][c - 1] + raw_map[r + 1][c - 1]
+        y = raw_map[r - 1][c - 1] + raw_map[r - 1][c + 1] + raw_map[r + 1][c - 1] + raw_map[r + 1][c + 1]
         return x + y
 
     # 随机填充地雷
@@ -109,8 +113,9 @@ def game_record() -> AjaxData:
     游戏记录
     :return:
     """
-    data = Record.query.filter_by(user_id=g.user.user_id)
-    return AjaxData(data=data)
+    max_per_page = current_app.config['MAX_PER_PAGE']
+    records = Record.query.filter_by(user_id=g.user.user_id).paginate(max_per_page=max_per_page, error_out=False)
+    return AjaxData(data=records)
 
 
 @bp.route('/rank')
@@ -124,7 +129,8 @@ def game_rank() -> AjaxData:
     if not form.validate():
         return AjaxData(400, '格式错误', form.errors)
 
-    rank = Record.query.filter_by(**form.data).order_by('remainder', 'playtime')
+    rank_limit = current_app.config['RANK_LIMIT']
+    rank = Record.query.filter_by(**form.data).order_by('remainder', 'playtime').limit(rank_limit)
     return AjaxData(data=rank)
 
 
