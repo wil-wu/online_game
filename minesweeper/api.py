@@ -3,7 +3,7 @@ import random
 from flask import Blueprint, request, session, g, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from minesweeper.forms import LoginForm, RegisterForm, SpecForm
+from minesweeper.forms import LoginForm, RegisterForm, SpecForm, RecordForm
 from minesweeper.models import db, User, Record
 from minesweeper.response import AjaxData
 from minesweeper.decorators import login_required
@@ -106,13 +106,21 @@ def gen_game_map() -> AjaxData:
     return AjaxData(data=rendered_map)
 
 
-@bp.route('/record')
+@bp.route('/record', methods=('GET', 'POST'))
 @login_required
 def game_record() -> AjaxData:
     """
     游戏记录
     :return:
     """
+    if request.method == 'POST':
+        form = RecordForm()
+        if not form.validate_on_submit():
+            return AjaxData(400, '格式错误', form.errors)
+        record = Record(**form.data, user_id=g.user.user_id)
+        db.session.add(record)
+        db.session.commit()
+
     max_per_page = current_app.config['MAX_PER_PAGE']
     records = Record.query.filter_by(user_id=g.user.user_id).paginate(max_per_page=max_per_page, error_out=False)
     return AjaxData(data=records)

@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, String, Float, ForeignKey
+from sqlalchemy import Integer, String, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass, Mapped, mapped_column, relationship, backref
 
 
@@ -24,9 +24,9 @@ class Record(db.Model):
     记录模型
     """
     record_id: Mapped[int] = mapped_column(Integer, init=False, primary_key=True)
-    playtime: Mapped[float] = mapped_column(Float, nullable=False)
+    playtime: Mapped[int] = mapped_column(Integer, nullable=False)
     remainder: Mapped[int] = mapped_column(Integer, nullable=False)
-    process: Mapped[str] = mapped_column(String, nullable=False)
+    operation: Mapped[str] = mapped_column(String, nullable=False)
     width: Mapped[int] = mapped_column(Integer, nullable=False)
     height: Mapped[int] = mapped_column(Integer, nullable=False)
     map: Mapped[str] = mapped_column(String, nullable=False)

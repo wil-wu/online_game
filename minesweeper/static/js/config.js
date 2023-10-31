@@ -7,7 +7,8 @@
         timeout: 5000,
         page: 1,
         size: 5,
-        selfPageSize: 100
+        selfPageSize: 100,
+        mineRate: 0.2,
     }
 
     // html模板地址
