@@ -38,6 +38,11 @@
         // 移除所有子元素
         removeChildren(el) {
             while (el.firstChild) el.removeChild(el.firstChild)
+        },
+
+        // 获取url参数
+        getURLParam(key) {
+            return new URLSearchParams(location.search).get(key)
         }
     }
 

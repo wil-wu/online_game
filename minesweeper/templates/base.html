@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh" class="h-100">
+<html lang="zh">
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}{% endblock %}</title>
@@ -7,8 +7,8 @@
   <link href="{{ url_for('static', filename='vendor/fontawsome/all.min.css') }}" rel="stylesheet">
   {% block styles %}{% endblock %}
 </head>
-<body class="h-100">
-<div class="container-fluid h-100 d-flex justify-content-center align-items-center">
+<body>
+<div class="container-fluid">
   {% block main %}{% endblock %}
 </div>
 <div class="alert fade alert-warning alert-fixed d-flex align-items-center translate-middle start-50" id="alert"

@@ -2,20 +2,24 @@ window.addEventListener('DOMContentLoaded', () => {
     'use strict'
 
     let cellContainer = document.querySelector('.cell-container')
-    let newGameBtn = document.querySelector('#new-game-btn')
+    let gameBtn = document.querySelector('#game-btn')
+    let reviewBtn = document.querySelector('#review-btn')
     let timer = document.querySelector('#timer')
     let flags = document.querySelector('#flags')
 
     const alert = new mdb.Alert('#alert')
 
     const gameState = new Proxy({
+        isReview: false,
         isOver: false,
         timer: null,
         flags: 0,
         current: 0,
         remainder: 0,
-        operation: [],
+        width: 0,
+        height: 0,
         map: [],
+        operation: [],
     }, {
         set(target, p, newValue) {
             target[p] = newValue
@@ -26,15 +30,24 @@ window.addEventListener('DOMContentLoaded', () => {
                 flags.textContent = newValue
             } else if (p === 'isOver' && newValue) {
                 overGame()
+            } else if (p === 'isReview') {
+                gameBtn.disabled = newValue
+                reviewBtn.disabled = newValue
             }
             return true
         }
     })
 
     // 重开游戏
-    newGameBtn.addEventListener('click', () => {
-        setup()
+    gameBtn.addEventListener('click', () => {
+        setupGame()
         initGame()
+    })
+
+    // 回放游戏
+    reviewBtn.addEventListener('click', () => {
+        setupReview()
+        reviewGame()
     })
 
     // 游戏区域禁止上下文菜单
@@ -43,40 +56,61 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 
     // 游戏初始化
-    const setup = () => {
-        domutil.removeChildren(cellContainer)
+    const setupGame = () => {
         let width = document.querySelector('#width').value
         let height = document.querySelector('#height').value
-        width = Number(width) ? width : 10
-        height = Number(height) ? height : 10
+        width = parseInt(width) ? width : 20
+        height = parseInt(height) ? height : 20
 
         // 获取地图
         request.get(_api.map, {params: {width, height}}).then((res) => {
             if (res.data.code === 200) {
                 const gameMap = res.data.data
                 const [m, n] = [gameMap.length, gameMap[0].length]
-
-                for (let i = 0; i < m; i++) {
-                    let cellRow = document.createElement('div')
-                    cellRow.className = 'd-flex'
-                    for (let j = 0; j < n; j++) {
-                        let cell = document.createElement('i')
-                        cell.className = 'cell cell-hide fa-solid'
-                        cell.dataset.i = i
-                        cell.dataset.j = j
-                        cell.dataset.state = 'hidden'
-                        cellRow.append(cell)
-                    }
-                    cellContainer.append(cellRow)
-                }
+                createMapUI(gameMap, m, n)
                 // 初始化配置
-                clearInterval(gameState.timer)
-                gameState.m = m
-                gameState.n = n
-                gameState.map = gameMap
                 gameState.isOver = false
-                gameState.current = 0
+                gameState.isReview = false
+                gameState.width = m
+                gameState.height = n
+                gameState.map = gameMap
+                gameState.operation = []
                 gameState.flags = Math.floor(m * n * _config.mineRate)
+                gameState.current = 0
+                gameState.remainder = m * n - gameState.flags
+            }
+        })
+    }
+
+    // 回放初始化
+    const setupReview = () => {
+        let id = domutil.getURLParam('id')
+        id = parseInt(id) ? id : -1
+
+        request.get(`/api/record/${id}`).then((res) => {
+            if (res.data.code === 200) {
+                const record = res.data.data
+                // 转换成二维数字数组
+                const gameMap = record.map
+                    .split(',')
+                    .map(sub => sub.split('-'))
+                    .map(sub => sub.map(item => parseInt(item)))
+                const operation = record.operation
+                    .split(',')
+                    .map(sub => sub.split('-'))
+                    .map(sub => sub.map(item => parseInt(item)))
+                const [m, n] = [gameMap.length, gameMap[0].length]
+
+                createMapUI(gameMap, m, n)
+                // 初始化配置
+                gameState.isReview = true
+                gameState.isOver = false
+                gameState.width = m
+                gameState.height = n
+                gameState.map = gameMap
+                gameState.operation = operation
+                gameState.flags = Math.floor(m * n * _config.mineRate)
+                gameState.current = 0
                 gameState.remainder = m * n - gameState.flags
             }
         })
@@ -84,27 +118,86 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 初始化操作监听
     const initGame = () => {
+        clearInterval(gameState.timer)
+        cellContainer.removeEventListener('mouseup', startTimer)
+        cellContainer.removeEventListener('mouseup', startPlay)
+
         cellContainer.addEventListener('mouseup', startTimer, {once: true})
         cellContainer.addEventListener('mouseup', startPlay)
     }
 
     // 移除操作监听，并提示信息
     const overGame = () => {
+        clearInterval(gameState.timer)
         cellContainer.removeEventListener('mouseup', startTimer)
         cellContainer.removeEventListener('mouseup', startPlay)
 
         let [type, text] = gameState.remainder === 0 ? ['alert-success', '游戏成功'] : ['alert-warning', '游戏失败']
         alert.setType(type).setText(text).show()
+        if (!gameState.isReview) saveGame()
+    }
+
+    // 保存游戏记录
+    const saveGame = () => {
+        request.post(_api.record, {
+            playtime: gameState.current,
+            remainder: gameState.remainder,
+            width: gameState.width,
+            height: gameState.height,
+            map: gameState.map.map(value => value.join('-')).join(','),
+            operation: gameState.operation.map(value => value.join('-')).join(','),
+        })
+    }
+
+    // 回放游戏
+    const reviewGame = () => {
+        let index = 0
         clearInterval(gameState.timer)
+        gameState.timer = setInterval(() => {
+            gameState.current += 16
+            let action = gameState.operation[index]
+            if (gameState.current >= action[0]) {
+                switch (action[3]) {
+                    case 0:
+                        recursiveClick(action[1], action[2])
+                        break
+                    case 1:
+                        quickClick(action[1], action[2])
+                        break
+                    case 2:
+                        rightClick(action[1], action[2])
+                        break
+                }
+                index++
+            }
+        }, 16)
+    }
+
+    // 创建地图界面
+    const createMapUI = (gameMap, m, n) => {
+        domutil.removeChildren(cellContainer)
+        for (let i = 0; i < m; i++) {
+            let cellRow = document.createElement('div')
+            cellRow.className = 'd-flex'
+            for (let j = 0; j < n; j++) {
+                let cell = document.createElement('i')
+                cell.className = 'cell cell-hide fa-solid'
+                cell.dataset.i = i
+                cell.dataset.j = j
+                cell.dataset.state = 'hidden'
+                cellRow.append(cell)
+            }
+            cellContainer.append(cellRow)
+        }
     }
 
     // 游戏区域操作
-    const isInvalid = (i, j) => i < 0 || j < 0 || i > gameState.m - 1 || j > gameState.n - 1
+    const isInvalid = (i, j) => i < 0 || j < 0 || i > gameState.width - 1 || j > gameState.height - 1
     // 获取周围旗子
     const getFlag = (i, j) => isInvalid(i, j) ? 0 : Number(cellContainer.children[i].children[j].dataset.state === 'flagged')
 
     // 递归点击
-    const recursiveClick = (i, j, depth) => {
+    const recursiveClick = (i, j, depth = 0) => {
         if (isInvalid(i, j)) {
             return
         }
@@ -212,22 +305,28 @@ window.addEventListener('DOMContentLoaded', () => {
         switch (evt.button) {
             // 左键
             case 0:
-                gameState.operation.push([gameState.current, i, j, 'leftClick'])
-                recursiveClick(i, j, 0)
+                gameState.operation.push([gameState.current, i, j, 0])
+                recursiveClick(i, j)
                 break;
             // 中键
             case 1:
-                gameState.operation.push([gameState.current, i, j, 'midClick'])
+                gameState.operation.push([gameState.current, i, j, 1])
                 quickClick(i, j)
                 break;
             // 右键
             case 2:
-                gameState.operation.push([gameState.current, i, j, 'rightClick'])
+                gameState.operation.push([gameState.current, i, j, 2])
                 rightClick(i, j)
                 break
         }
     }
 
-    setup()
-    initGame()
+    // 回放或游玩
+    if (domutil.getURLParam('id')) {
+        setupReview()
+        reviewGame()
+    } else {
+        setupGame()
+        initGame()
+    }
 })

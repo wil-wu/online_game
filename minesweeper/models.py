@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Integer, String, ForeignKey
-from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass, Mapped, mapped_column, relationship, backref
+from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase, MappedAsDataclass):
@@ -31,4 +31,4 @@ class Record(db.Model):
     height: Mapped[int] = mapped_column(Integer, nullable=False)
     map: Mapped[str] = mapped_column(String, nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey('user.user_id'))
-    user: Mapped['User'] = relationship('User', backref=backref('records'))
+    user: Mapped['User'] = relationship('User', init=False, backref='records')

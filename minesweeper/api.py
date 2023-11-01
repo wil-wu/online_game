@@ -117,13 +117,27 @@ def game_record() -> AjaxData:
         form = RecordForm()
         if not form.validate_on_submit():
             return AjaxData(400, '格式错误', form.errors)
-        record = Record(**form.data, user_id=g.user.user_id)
+        data = form.data
+        data.pop('csrf_token')
+        record = Record(**data, user_id=g.user.user_id)
         db.session.add(record)
         db.session.commit()
+        return AjaxData(msg='已保存游戏记录')
 
     max_per_page = current_app.config['MAX_PER_PAGE']
-    records = Record.query.filter_by(user_id=g.user.user_id).paginate(max_per_page=max_per_page, error_out=False)
+    records = Record.query.filter_by(user_id=g.user.user_id).paginate(max_per_page=max_per_page, error_out=False).items
     return AjaxData(data=records)
+
+
+@bp.route('/record/<int:record_id>')
+@login_required
+def single_record(record_id: int) -> AjaxData:
+    record = Record.query.get(record_id)
+    if record is None:
+        return AjaxData(400, '记录不存在')
+    if record.user_id != g.user.user_id:
+        return AjaxData(400, '无权限访问')
+    return AjaxData(data=record)
 
 
 @bp.route('/rank')
