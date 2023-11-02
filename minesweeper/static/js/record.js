@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let widthEl = document.querySelector('#width')
     let heightEl = document.querySelector('#height')
 
-    const pager = new mdb.Pagination('#pager')
+    const pager = new mdb.Pagination()
 
     // 查看回放
     const goReview = (evt) => {
@@ -53,7 +53,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const initHistory = () => {
         request.get(_api.history, {params: {'page': _config.page, 'per_page': _config.perPage}}).then((res) => {
             let pagination = res.data.data
-            pager.init(pagination.pages, fillHistory)
+            pager.init('#pager', pagination.pages, fillHistory)
             domutil.removeChildren(historyContainer)
             historyContainer.addEventListener('click', goReview)
             historyContainer.insertAdjacentHTML('beforeend', templates.historyTemplate(pagination.items))

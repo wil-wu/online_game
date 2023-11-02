@@ -81,7 +81,7 @@
             let view = ''
             view += `<li class="page-item"><a class="page-link" data-page="prev" href="javascript:void(0)">上一页</a></li>`
             for (let i = 0; i < pages; i++) {
-                view += view += `<li class="page-item"><a class="page-link" data-page="${i + 1}" href="javascript:void(0)">${i + 1}</a></li>`
+                view += `<li class="page-item"><a class="page-link" data-page="${i + 1}" href="javascript:void(0)">${i + 1}</a></li>`
             }
             view += `<li class="page-item"><a class="page-link" data-page="next" href="javascript:void(0)">下一页</a></li>`
             return view
@@ -139,10 +139,6 @@
         _callback
         _active
 
-        constructor(selector) {
-            this._element = document.querySelector(selector)
-        }
-
         // 监听当前页变化
         set _page(val) {
             let page = parseInt(val)
@@ -153,8 +149,9 @@
         }
 
         // 初始化组件
-        init(pages, callback) {
+        init(selector, pages, callback) {
             this._callback = callback
+            this._element = document.querySelector(selector)
 
             domutil.removeChildren(this._element)
             this._element.insertAdjacentHTML('beforeend', templates.paginationTemplate(pages))
