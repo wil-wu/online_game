@@ -46,6 +46,48 @@
         }
     }
 
+    // dom模板
+    window.templates = {
+        // 排行榜模板
+        rankTemplate(data) {
+            let view = ''
+            for (const datum of data) {
+                let html = `<li class="list-group-item d-flex justify-content-between align-items-start">
+                              <div class="ms-2 me-auto">
+                                <div class="fw-bold">${datum.user.username}</div>
+                                <div class="small text-muted">${datum.width} x ${datum.height}</div>
+                              </div>
+                              <span class="badge badge-primary rounded-pill">${datum.playtime}</span>
+                            </li>`
+                view += html
+            }
+            return view
+        },
+
+        // 游戏记录模板
+        historyTemplate(data) {
+            let view = ''
+            for (const datum of data) {
+                let html = `<li class="list-group-item d-flex justify-content-between align-items-center" data-id="${datum.record_id}">
+                              <div>${datum.width} x ${datum.height}</div>
+                              <span class="badge badge-primary rounded-pill">${datum.playtime}</span>
+                            </li>`
+                view += html
+            }
+            return view
+        },
+
+        paginationTemplate(pages) {
+            let view = ''
+            view += `<li class="page-item"><a class="page-link" data-page="prev" href="javascript:void(0)">上一页</a></li>`
+            for (let i = 0; i < pages; i++) {
+                view += view += `<li class="page-item"><a class="page-link" data-page="${i + 1}" href="javascript:void(0)">${i + 1}</a></li>`
+            }
+            view += `<li class="page-item"><a class="page-link" data-page="next" href="javascript:void(0)">下一页</a></li>`
+            return view
+        }
+    }
+
     // 携带csrf_token
     axios.defaults.headers.common['X-CSRFToken'] = domutil.getCookie('csrftoken')
 
@@ -87,6 +129,69 @@
         this._element.classList.remove('show')
         this._element.classList.add('hide')
         this._element.style.setProperty('top', '-50%')
+    }
+
+    // 分页组件
+    mdb.Pagination = class Pagination {
+        _element
+        _page
+        _perPage
+        _callback
+        _active
+
+        constructor(selector) {
+            this._element = document.querySelector(selector)
+        }
+
+        // 监听当前页变化
+        set _page(val) {
+            let page = parseInt(val)
+            if (page && page > 0 && this._page !== val) {
+                this._page = page
+                this._callback(this._page, this._perPage)
+            }
+        }
+
+        // 初始化组件
+        init(pages, callback) {
+            this._callback = callback
+
+            domutil.removeChildren(this._element)
+            this._element.insertAdjacentHTML('beforeend', templates.paginationTemplate(pages))
+            this._element.addEventListener('click', (evt) => {
+                let page = evt.target.dataset.page
+                if (!page) return
+
+                if (page === 'prev') {
+                    this._page -= 1
+                } else if (page === 'next') {
+                    this._page += 1
+                } else {
+                    this._page = parseInt(page)
+                }
+            })
+        }
+
+        // 回收组件
+        dispose() {
+            domutil.removeChildren(this._element)
+            this._element = null
+        }
+    }
+
+    // 扩展组件监听器
+    for (const component of [mdb.Tab, mdb.Toast, mdb.Modal]) {
+        component.prototype.on = function (type, handler, options = {}) {
+            this._element.addEventListener(type, handler, options)
+            return this
+        }
+        component.prototype.once = function (type, handler) {
+            return this.on(type, handler, {once: true})
+        }
+        component.prototype.off = function (type, handler, options = {}) {
+            this._element.removeEventListener(type, handler, options)
+            return this
+        }
     }
 
 })()

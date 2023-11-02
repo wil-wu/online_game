@@ -57,10 +57,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 游戏初始化
     const setupGame = () => {
-        let width = document.querySelector('#width').value
-        let height = document.querySelector('#height').value
-        width = parseInt(width) ? width : 20
-        height = parseInt(height) ? height : 20
+        let width = parseInt(document.querySelector('#width').value)
+        let height = parseInt(document.querySelector('#height').value)
+        width = width && width >= 10 && width <= 100 ? width : 20
+        height = height && height >= 10 && height <= 100 ? height : 20
 
         // 获取地图
         request.get(_api.map, {params: {width, height}}).then((res) => {
@@ -87,7 +87,7 @@ window.addEventListener('DOMContentLoaded', () => {
         let id = domutil.getURLParam('id')
         id = parseInt(id) ? id : -1
 
-        request.get(`/api/record/${id}`).then((res) => {
+        request.get(`/api/history/${id}`).then((res) => {
             if (res.data.code === 200) {
                 const record = res.data.data
                 // 转换成二维数字数组
@@ -139,7 +139,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 保存游戏记录
     const saveGame = () => {
-        request.post(_api.record, {
+        request.post(_api.history, {
             playtime: gameState.current,
             remainder: gameState.remainder,
             width: gameState.width,

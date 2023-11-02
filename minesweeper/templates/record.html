@@ -2,7 +2,27 @@
 {% block title %}记录{% endblock %}
 {% block main %}
   <main class="position-absolute top-50 start-50 translate-middle">
-
+    <ul class="nav nav-tabs nav-fill mb-3" id="record-tabs">
+      <li class="nav-item">
+        <a class="nav-link" id="rank-tab" data-mdb-target="#rank-tab-pane">排行榜</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="history-tab" data-mdb-target="#history-tab-pane">个人记录</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="record-content">
+      <div class="tab-pane fade" id="rank-tab-pane">
+        <div class="input-group input-group-sm">
+          <input type="number" class="form-control" id="width" placeholder="宽" style="width: 80px"/>
+          <input type="number" class="form-control" id="height" placeholder="高" style="width: 80px"/>
+        </div>
+        <ol class="list-group list-group-light list-group-numbered" id="rank-container"></ol>
+      </div>
+      <div class="tab-pane fade" id="history-tab-pane">
+        <ol class="list-group list-group-light" id="history-container"></ol>
+        <ul class="pagination" id="pager"></ul>
+      </div>
+    </div>
   </main>
 {% endblock %}
 {% block scripts %}

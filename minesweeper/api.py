@@ -106,9 +106,9 @@ def gen_game_map() -> AjaxData:
     return AjaxData(data=rendered_map)
 
 
-@bp.route('/record', methods=('GET', 'POST'))
+@bp.route('/history', methods=('GET', 'POST'))
 @login_required
-def game_record() -> AjaxData:
+def game_history() -> AjaxData:
     """
     游戏记录
     :return:
@@ -125,13 +125,21 @@ def game_record() -> AjaxData:
         return AjaxData(msg='已保存游戏记录')
 
     max_per_page = current_app.config['MAX_PER_PAGE']
-    records = Record.query.filter_by(user_id=g.user.user_id).paginate(max_per_page=max_per_page, error_out=False).items
-    return AjaxData(data=records)
+    pagination = Record.query.filter_by(user_id=g.user.user_id).paginate(max_per_page=max_per_page, error_out=False)
+    return AjaxData(data={
+        'pages': pagination.pages,
+        'items': pagination.items,
+        'total': pagination.total,
+        'hasPrev': pagination.has_prev,
+        'prevNum': pagination.prev_num,
+        'hasNext': pagination.has_next,
+        'nextNum': pagination.next_num,
+    })
 
 
-@bp.route('/record/<int:record_id>')
+@bp.route('/history/<int:record_id>')
 @login_required
-def single_record(record_id: int) -> AjaxData:
+def single_history(record_id: int) -> AjaxData:
     record = Record.query.get(record_id)
     if record is None:
         return AjaxData(400, '记录不存在')
@@ -152,7 +160,7 @@ def game_rank() -> AjaxData:
         return AjaxData(400, '格式错误', form.errors)
 
     rank_limit = current_app.config['RANK_LIMIT']
-    rank = Record.query.filter_by(**form.data).order_by('remainder', 'playtime').limit(rank_limit)
+    rank = Record.query.filter_by(**form.data).order_by('remainder', 'playtime').limit(rank_limit).all()
     return AjaxData(data=rank)
 
 

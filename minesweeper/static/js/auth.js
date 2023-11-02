@@ -31,15 +31,15 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const tabShow = () => location.hash === '#register' ? registerTab.show() : loginTab.show()
 
     // 哈希路由监听
-    window.addEventListener('hashchange', () => {
-        location.hash === '#register' ? registerTab.show() : loginTab.show()
-    })
+    window.addEventListener('hashchange', tabShow)
 
-    loginTab._element.addEventListener('click', () => location.hash = '#login')
-    registerTab._element.addEventListener('click', () => location.hash = '#register')
+    loginTab.on('click', () => location.hash = '#login')
+    registerTab.on('click', () => location.hash = '#register')
 
+    tabShow()
 
     // 表单绑定
     forms.forEach((formEl) => {
