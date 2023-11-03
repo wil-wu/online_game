@@ -13,7 +13,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (res.data.code === 200) {
                     location.href = _urls.game
                 } else {
-                    let error = Object.values(res.data.data).map(value => value.join(', ')) .join(', ')
+                    let error = Object.values(res.data.data).map(value => value.join(', ')).join(', ')
                     alert.setType('alert-warning').setText(error).show()
                 }
             })
@@ -24,7 +24,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     location.hash = '#login'
                     alert.setType('alert-success').setText(res.data.msg).show()
                 } else {
-                    let error = Object.values(res.data.data).map(value => value.join(', ')) .join(', ')
+                    let error = Object.values(res.data.data).map(value => value.join(', ')).join(', ')
                     alert.setType('alert-warning').setText(error).show()
                 }
             })
@@ -42,16 +42,16 @@ window.addEventListener('DOMContentLoaded', () => {
     tabShow()
 
     // 表单绑定
-    forms.forEach((formEl) => {
-        let btn = formEl.querySelector('button')
+    forms.forEach((form) => {
+        form.addEventListener('submit', (evt) => {
+            evt.preventDefault()
 
-        btn.addEventListener('click', () => {
-            if (!formEl.checkValidity()) {
-                formEl.classList.add('was-validated')
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated')
             } else {
-                let data = domutil.serializeForm(formEl)
-                fnMap[formEl.dataset.action](data)
-                formEl.classList.remove('was-validated')
+                let data = domutil.serializeForm(form)
+                fnMap[form.dataset.action](data)
+                form.classList.remove('was-validated')
             }
         })
     })
