@@ -16,10 +16,30 @@
           <input type="number" class="form-control" id="width" placeholder="宽" style="width: 80px"/>
           <input type="number" class="form-control" id="height" placeholder="高" style="width: 80px"/>
         </div>
-        <ol class="list-group list-group-light list-group-numbered" id="rank-container"></ol>
+        <table class="table">
+          <thead>
+          <tr>
+            <th>排名</th>
+            <th>玩家</th>
+            <th>游戏规格</th>
+            <th>剩余格子</th>
+            <th>游戏时间</th>
+          </tr>
+          </thead>
+          <tbody id="rank-container"></tbody>
+        </table>
       </div>
       <div class="tab-pane fade" id="history-tab-pane">
-        <ol class="list-group list-group-light" id="history-container"></ol>
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th>游戏规格</th>
+            <th>剩余格子</th>
+            <th>游戏时间</th>
+          </tr>
+          </thead>
+          <tbody id="history-container"></tbody>
+        </table>
         <ul class="pagination" id="pager"></ul>
       </div>
     </div>

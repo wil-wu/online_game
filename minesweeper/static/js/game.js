@@ -28,8 +28,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 timer.textContent = Math.floor(newValue / 1000)
             } else if (p === 'flags') {
                 flags.textContent = newValue
-            } else if (p === 'isOver' && newValue) {
-                overGame()
+            } else if (p === 'isOver') {
+                if (newValue) overGame()
+                reviewBtn.disabled = !newValue
             } else if (p === 'isReview') {
                 gameBtn.disabled = newValue
                 reviewBtn.disabled = newValue
@@ -70,7 +71,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 createMapUI(gameMap, m, n)
                 // 初始化配置
                 gameState.isOver = false
-                gameState.isReview = false
                 gameState.width = m
                 gameState.height = n
                 gameState.map = gameMap
@@ -84,36 +84,45 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 回放初始化
     const setupReview = () => {
-        let id = domutil.getURLParam('id')
-        id = parseInt(id) ? id : -1
+        if (gameState.operation.length) {
+            createMapUI(gameState.map, gameState.width, gameState.height)
+            gameState.isReview = true
+            gameState.isOver = false
+            gameState.flags = Math.floor(gameState.width * gameState.height * _config.mineRate)
+            gameState.current = 0
+            gameState.remainder = gameState.width * gameState.height - gameState.flags
+        } else {
+            let id = parseInt(domutil.getURLParam('id'))
+            id = id ? id : -1
 
-        request.get(`/api/history/${id}`).then((res) => {
-            if (res.data.code === 200) {
-                const record = res.data.data
-                // 转换成二维数字数组
-                const gameMap = record.map
-                    .split(',')
-                    .map(sub => sub.split('-'))
-                    .map(sub => sub.map(item => parseInt(item)))
-                const operation = record.operation
-                    .split(',')
-                    .map(sub => sub.split('-'))
-                    .map(sub => sub.map(item => parseInt(item)))
-                const [m, n] = [gameMap.length, gameMap[0].length]
+            request.get(`/api/history/${id}`).then((res) => {
+                if (res.data.code === 200) {
+                    const record = res.data.data
+                    // 转换成二维数字数组
+                    const gameMap = record.map
+                        .split(',')
+                        .map(sub => sub.split('-'))
+                        .map(sub => sub.map(item => parseInt(item)))
+                    const operation = record.operation
+                        .split(',')
+                        .map(sub => sub.split('-'))
+                        .map(sub => sub.map(item => parseInt(item)))
+                    const [m, n] = [gameMap.length, gameMap[0].length]
 
-                createMapUI(gameMap, m, n)
-                // 初始化配置
-                gameState.isReview = true
-                gameState.isOver = false
-                gameState.width = m
-                gameState.height = n
-                gameState.map = gameMap
-                gameState.operation = operation
-                gameState.flags = Math.floor(m * n * _config.mineRate)
-                gameState.current = 0
-                gameState.remainder = m * n - gameState.flags
-            }
-        })
+                    createMapUI(gameMap, m, n)
+                    // 初始化配置
+                    gameState.isReview = true
+                    gameState.isOver = false
+                    gameState.width = m
+                    gameState.height = n
+                    gameState.map = gameMap
+                    gameState.operation = operation
+                    gameState.flags = Math.floor(m * n * _config.mineRate)
+                    gameState.current = 0
+                    gameState.remainder = m * n - gameState.flags
+                }
+            })
+        }
     }
 
     // 初始化操作监听
@@ -152,7 +161,6 @@ window.addEventListener('DOMContentLoaded', () => {
     // 回放游戏
     const reviewGame = () => {
         let index = 0
-        clearInterval(gameState.timer)
         gameState.timer = setInterval(() => {
             gameState.current += 16
             let action = gameState.operation[index]
@@ -170,6 +178,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
                 index++
             }
+            if (index === gameState.operation.length) gameState.isReview = false
         }, 16)
     }
 
@@ -301,6 +310,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const startPlay = (evt) => {
         let cell = evt.target
         let [i, j] = [parseInt(cell.dataset.i), parseInt(cell.dataset.j)]
+        if (!cell.classList.contains('cell')) return
 
         switch (evt.button) {
             // 左键

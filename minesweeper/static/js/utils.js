@@ -43,6 +43,11 @@
         // 获取url参数
         getURLParam(key) {
             return new URLSearchParams(location.search).get(key)
+        },
+
+        // 格式化毫秒
+        millisecondFormat(value) {
+            return `${Math.floor(value / 1000)}.${value % 1000}s`
         }
     }
 
@@ -51,14 +56,17 @@
         // 排行榜模板
         rankTemplate(data) {
             let view = ''
-            for (const datum of data) {
-                let html = `<li class="list-group-item d-flex justify-content-between align-items-start">
-                              <div class="ms-2 me-auto">
-                                <div class="fw-bold">${datum.user.username}</div>
-                                <div class="small text-muted">${datum.width} x ${datum.height}</div>
-                              </div>
-                              <span class="badge badge-primary rounded-pill">${datum.playtime}</span>
-                            </li>`
+            if (!data.length) view += '<tr><td class="text-muted text-center" colspan="5">无数据</td></tr>'
+
+            for (let i = 0; i < data.length; i++) {
+                let datum = data[i]
+                let html = `<tr>
+                              <td>${i + 1}</td>
+                              <td>${datum.user.username}</td>
+                              <td>${datum.width} x ${datum.height}</td>
+                              <td>${datum.remainder}</td>
+                              <td>${domutil.millisecondFormat(datum.playtime)}</td>
+                            </tr>`
                 view += html
             }
             return view
@@ -67,11 +75,14 @@
         // 游戏记录模板
         historyTemplate(data) {
             let view = ''
+            if (!data.length) view += '<tr><td class="text-muted text-center" colspan="3">无数据</td></tr>'
+
             for (const datum of data) {
-                let html = `<li class="list-group-item d-flex justify-content-between align-items-center" data-id="${datum.record_id}">
-                              <div>${datum.width} x ${datum.height}</div>
-                              <span class="badge badge-primary rounded-pill">${datum.playtime}</span>
-                            </li>`
+                let html = `<tr data-id="${datum.record_id}">
+                              <td>${datum.width} x ${datum.height}</td>
+                              <td>${datum.remainder}</td>
+                              <td>${domutil.millisecondFormat(datum.playtime)}</td>
+                            </tr>`
                 view += html
             }
             return view
@@ -136,43 +147,68 @@
         _element
         _page
         _perPage
+        _pages
         _callback
         _active
+        _paginate
 
-        // 监听当前页变化
-        set _page(val) {
-            let page = parseInt(val)
-            if (page && page > 0 && this._page !== val) {
-                this._page = page
-                this._callback(this._page, this._perPage)
-            }
+        // 监听page变化
+        set page(val) {
+            if (val < 1 || val > this._pages || val === this._page) return
+
+            this._page = val
+            let active = this._element.children[val]
+            let prev = this._element.firstElementChild
+            let next = this._element.lastElementChild
+
+            if (val === 1) prev.classList.add('disabled')
+            else prev.classList.remove('disabled')
+            if (val === this._pages) next.classList.add('disabled')
+            else next.classList.remove('disabled')
+
+            if (this._active) this._active.classList.remove('active')
+            active.classList.add('active')
+            this._active = active
+            this._callback(this._page, this._perPage)
+        }
+
+        get page() {
+            return this._page
         }
 
         // 初始化组件
-        init(selector, pages, callback) {
-            this._callback = callback
+        init(selector, pager, callback) {
+            this._page = pager.page
+            this._perPage = pager.perPage
+            this._pages = pager.pages
             this._element = document.querySelector(selector)
+            this._callback = callback
+            this._paginate = (evt) => {
+                let el = evt.target
+                let page = el.dataset.page
 
-            domutil.removeChildren(this._element)
-            this._element.insertAdjacentHTML('beforeend', templates.paginationTemplate(pages))
-            this._element.addEventListener('click', (evt) => {
-                let page = evt.target.dataset.page
                 if (!page) return
 
-                if (page === 'prev') {
-                    this._page -= 1
-                } else if (page === 'next') {
-                    this._page += 1
+                if (parseInt(page)) {
+                    this.page = parseInt(page)
                 } else {
-                    this._page = parseInt(page)
+                    this.page += page === 'prev' ? -1 : 1
                 }
-            })
+            }
+
+            domutil.removeChildren(this._element)
+            this._element.insertAdjacentHTML('beforeend', templates.paginationTemplate(this._pages))
+            this._element.addEventListener('click', this._paginate)
         }
 
         // 回收组件
         dispose() {
             domutil.removeChildren(this._element)
+            this._element.removeEventListener('click', this._paginate)
             this._element = null
+            this._callback = null
+            this._paginate = null
+            this._active = null
         }
     }
 

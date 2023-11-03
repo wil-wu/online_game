@@ -126,15 +126,7 @@ def game_history() -> AjaxData:
 
     max_per_page = current_app.config['MAX_PER_PAGE']
     pagination = Record.query.filter_by(user_id=g.user.user_id).paginate(max_per_page=max_per_page, error_out=False)
-    return AjaxData(data={
-        'pages': pagination.pages,
-        'items': pagination.items,
-        'total': pagination.total,
-        'hasPrev': pagination.has_prev,
-        'prevNum': pagination.prev_num,
-        'hasNext': pagination.has_next,
-        'nextNum': pagination.next_num,
-    })
+    return AjaxData(data={'pages': pagination.pages, 'items': pagination.items})
 
 
 @bp.route('/history/<int:record_id>')

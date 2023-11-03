@@ -14,12 +14,12 @@
       <div class="mx-5 d-flex align-items-center">
         <div class="d-flex align-items-center"><i class="fa-solid fa-flag"></i><span class="ms-2" id="flags">0</span>
         </div>
-        <div class="ms-3 d-flex align-items-center"><i class="fa-solid fa-clock"></i><span class="ms-2" id="timer">000</span></div>
+        <div class="ms-3 d-flex align-items-center"><i class="fa-solid fa-clock"></i><span class="ms-2" id="timer">000</span>s</div>
       </div>
       <div class="d-flex align-items-center">
-        <button type="button" id="review-btn" class="btn btn-sm btn-outline-dark"><i
+        <button type="button" id="review-btn" class="btn btn-sm btn-outline-dark" data-mdb-toggle="tooltip" title="回放"><i
           class="fa-solid fa-clock-rotate-left"></i></button>
-        <a href="{{ url_for('views.record') }}" id="rank-btn" class="btn btn-sm btn-outline-dark"><i
+        <a href="{{ url_for('views.record') }}" id="rank-btn" class="btn btn-sm btn-outline-dark" data-mdb-toggle="tooltip" title="记录"><i
           class="fa-solid fa-ranking-star"></i>
         </a>
       </div>

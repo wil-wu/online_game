@@ -14,7 +14,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 查看回放
     const goReview = (evt) => {
-        let id = evt.target.dataset.id
+        let id = evt.target.parentElement.dataset.id
         if (id) location.href = _urls.game + `?id=${id}`
     }
 
@@ -53,7 +53,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const initHistory = () => {
         request.get(_api.history, {params: {'page': _config.page, 'per_page': _config.perPage}}).then((res) => {
             let pagination = res.data.data
-            pager.init('#pager', pagination.pages, fillHistory)
+            pager.init('#pager', {page: _config.page, perPage: _config.perPage, pages: pagination.pages}, fillHistory)
             domutil.removeChildren(historyContainer)
             historyContainer.addEventListener('click', goReview)
             historyContainer.insertAdjacentHTML('beforeend', templates.historyTemplate(pagination.items))
