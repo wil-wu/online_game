@@ -52,7 +52,7 @@ def register() -> AjaxData:
     username = form.data['username']
     password = form.data['password']
 
-    if User.query.filter_by(username=username).first():
+    if User.query.filter_by(username=username).scalar():
         error = {'username': ['用户名已存在']}
         return AjaxData(400, '注册失败', error)
 
@@ -118,7 +118,7 @@ def game_history() -> AjaxData:
         if not form.validate_on_submit():
             return AjaxData(400, '格式错误', form.errors)
         data = form.data
-        data.pop('csrf_token')
+        data.pop('csrf_token', None)
         record = Record(**data, user_id=g.user.user_id)
         db.session.add(record)
         db.session.commit()
@@ -132,7 +132,7 @@ def game_history() -> AjaxData:
 @bp.route('/history/<int:record_id>')
 @login_required
 def single_history(record_id: int) -> AjaxData:
-    record = Record.query.get(record_id)
+    record = db.session.get(Record, record_id)
     if record is None:
         return AjaxData(400, '记录不存在')
     if record.user_id != g.user.user_id:
@@ -163,4 +163,4 @@ def before_request():
     if user_id is None:
         g.user = None
     else:
-        g.user = User.query.get(user_id)
+        g.user = db.session.get(User, user_id)
