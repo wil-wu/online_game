@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, FloatField
+from wtforms import StringField, IntegerField
 from wtforms.validators import DataRequired, NumberRange, Length, EqualTo
 
 
@@ -33,7 +33,7 @@ class RecordForm(FlaskForm):
     """
     游戏记录表单
     """
-    playtime = FloatField('playtime', validators=[DataRequired()])
+    playtime = IntegerField('playtime', validators=[DataRequired()])
     remainder = IntegerField('remainder', validators=[DataRequired()])
     operation = StringField('process', validators=[DataRequired()])
     width = IntegerField('width', validators=[DataRequired(), NumberRange(10, 100)])

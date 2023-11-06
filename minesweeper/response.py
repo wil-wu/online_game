@@ -10,6 +10,4 @@ class AjaxData(dict):
     :param data: 返回数据
     """
     def __init__(self, code: int = 200, msg: str = '', data: Optional[Union[dict, list]] = None):
-        if data is None:
-            data = {}
         super().__init__(code=code, msg=msg, data=data)
