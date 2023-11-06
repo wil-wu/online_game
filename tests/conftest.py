@@ -1,12 +1,13 @@
 import pytest
-from flask.testing import FlaskClient, TestResponse
+from flask.testing import FlaskClient
+from werkzeug.test import TestResponse
 from werkzeug.security import generate_password_hash
 
 from minesweeper import create_app
 from minesweeper.models import db, User, Record
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def app():
     app = create_app('test')
     with app.app_context():
@@ -23,7 +24,8 @@ def app():
 
     yield app
 
-    db.drop_all()
+    with app.app_context():
+        db.drop_all()
 
 
 @pytest.fixture
