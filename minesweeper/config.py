@@ -16,6 +16,8 @@ class DevelopmentConfig(BaseConfig):
 
 class TestConfig(BaseConfig):
     TESTING = True
+    WTF_CSRF_ENABLED = False
+    WTF_CSRF_CHECK_DEFAULT = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
 

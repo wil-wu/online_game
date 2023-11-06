@@ -1,7 +1,6 @@
 import pytest
-from flask import session
 
-from minesweeper.models import Record
+from minesweeper.models import db, Record
 
 
 def test_gen_game_map(client, auth):
@@ -50,16 +49,16 @@ def test_game_history(app, client, auth):
         'playtime': 3,
         'remainder': 3,
         'operation': '3',
-        'width': 3,
-        'height': 3,
-        'map': '3'
+        'width': 10,
+        'height': 10,
+        'map': '3',
     })
     assert response.json['msg'] == '已保存游戏记录'
 
-    with client:
-        record = Record.query.get(3)
+    with app.app_context():
+        record = db.session.get(Record, 3)
         assert record is not None
-        assert session['user_id'] == record.user_id
+        assert record.user_id == 1
 
 
 @pytest.mark.parametrize(('playtime', 'remainder', 'operation', 'width', 'height', 'game_map', 'message'), (
@@ -95,15 +94,16 @@ def test_single_history(client, auth):
 
     # 访问他人游戏记录
     response = client.get('/api/history/2')
-    assert response.json['code'] == 400
+    assert response.json['msg'] == '无权限访问'
+    assert response.json['data'] is None
 
     # 访问不存在的记录
     response = client.get('/api/history/1145114')
-    assert response.json['code'] == 400
+    assert response.json['msg'] == '记录不存在'
+    assert response.json['data'] is None
 
     # 访问自己存在的记录
     response = client.get('/api/history/1')
-    assert response.json['code'] == 200
     assert response.json['data'] is not None
 
 
@@ -131,5 +131,4 @@ def test_login_required_api(client, path):
     """
     response = client.get(path)
     # 未登录重定向到验证页面
-    assert len(response.history) == 1
-    assert response.request.path == '/auth'
+    assert response.headers['Location'] == '/auth'

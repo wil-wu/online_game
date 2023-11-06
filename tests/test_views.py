@@ -20,8 +20,8 @@ def test_record_view(client, auth):
 
 
 @pytest.mark.parametrize('path', (
-    '/auth',
     '/game',
+    '/record',
 ))
 def test_login_required_views(client, path):
     """
@@ -29,7 +29,7 @@ def test_login_required_views(client, path):
     """
     response = client.get(path)
     # 未登录重定向到验证页面
-    assert response.request.path == '/auth'
+    assert response.headers['Location'] == '/auth'
 
 
 @pytest.mark.parametrize('path', (
@@ -44,6 +44,6 @@ def test_csrf_token(client, auth, path):
     auth.login()
 
     response = client.get(path)
-    cookie = response.headers.get('cookie')
+    cookie = response.headers.get('Set-Cookie')
     assert cookie is not None
     assert 'csrftoken' in cookie

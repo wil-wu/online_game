@@ -20,14 +20,14 @@ def test_login(client, auth):
 
 
 @pytest.mark.parametrize(('username', 'password', 'message'), (
-    ('test1', '', '格式错误'),
-    ('', 'test1', '格式错误'),
-    ('test1', 't', '格式错误'),
-    ('t', 'test1', '格式错误'),
-    ('testtesttesttesttesttest', 'test1', '格式错误'),
-    ('test1', 'testtesttesttesttesttest', '格式错误'),
-    ('test1', 'tes', '登录失败'),
-    ('tes', 'test1', '登录失败'),
+    ('test', '', '格式错误'),
+    ('', 'password', '格式错误'),
+    ('test', 't', '格式错误'),
+    ('t', 'password', '格式错误'),
+    ('testtesttesttesttesttest', 'password', '格式错误'),
+    ('test', 'passwordpasswordpassword', '格式错误'),
+    ('test1145114', 'password', '登录失败'),
+    ('test1', 'password1145114', '登录失败'),
 ))
 def test_login_validate_input(auth, username, password, message):
     """
@@ -37,18 +37,20 @@ def test_login_validate_input(auth, username, password, message):
     assert message == response.json['msg']
 
 
-def test_register(auth):
+def test_register(app, auth):
     """
     注册接口测试
     """
-    response = auth.register('test3', 'test3', 'test3')
+    response = auth.register('test3', 'password', 'password')
     assert response.json['msg'] == '注册成功'
-    assert User.query.filter_by(username='test3').first() is not None
+
+    with app.app_context():
+        assert User.query.filter_by(username='test3').scalar() is not None
 
 
 @pytest.mark.parametrize(('username', 'password', 'confirm', 'message'), (
-    ('test3', 'test3', 'test', '格式错误'),
-    ('test1', 'test3', 'test3', '注册失败'),
+    ('test3', 'password1', 'password2', '格式错误'),
+    ('test1', 'password', 'password', '注册失败'),
 ))
 def test_register_validate_input(auth, username, password, confirm, message):
     """
