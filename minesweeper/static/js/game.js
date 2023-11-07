@@ -235,14 +235,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
         let flags = getAroundFlags(i, j)
         if (flags !== 0 && gameState.map[i][j] === flags) {
-            singleClick(i - 1, j)
-            singleClick(i + 1, j)
-            singleClick(i, j - 1)
-            singleClick(i, j + 1)
-            singleClick(i - 1, j - 1)
-            singleClick(i - 1, j + 1)
-            singleClick(i + 1, j - 1)
-            singleClick(i + 1, j + 1)
+            recursiveClick(i - 1, j)
+            recursiveClick(i + 1, j)
+            recursiveClick(i, j - 1)
+            recursiveClick(i, j + 1)
+            recursiveClick(i - 1, j - 1)
+            recursiveClick(i - 1, j + 1)
+            recursiveClick(i + 1, j - 1)
+            recursiveClick(i + 1, j + 1)
         }
     }
 

@@ -151,6 +151,7 @@
         _callback
         _active
         _paginate
+        _created
 
         // 监听page变化
         set page(val) {
@@ -178,6 +179,9 @@
 
         // 初始化组件
         init(selector, pager, callback) {
+            if (this._created) return
+
+            this._created = true
             this._page = pager.page
             this._perPage = pager.perPage
             this._pages = pager.pages
@@ -205,6 +209,7 @@
         dispose() {
             domutil.removeChildren(this._element)
             this._element.removeEventListener('click', this._paginate)
+            this._created = false
             this._element = null
             this._callback = null
             this._paginate = null

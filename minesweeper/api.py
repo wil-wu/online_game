@@ -1,6 +1,6 @@
 import random
 
-from flask import Blueprint, request, session, g, current_app
+from flask import Blueprint, request, url_for, redirect, session, g, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from minesweeper.forms import LoginForm, RegisterForm, SpecForm, RecordForm
@@ -62,6 +62,15 @@ def register() -> AjaxData:
     return AjaxData(msg='注册成功')
 
 
+@bp.route('/logout')
+def logout():
+    """
+    退出登录
+    """
+    session.clear()
+    return redirect(url_for('views.auth'))
+
+
 @bp.route('/map')
 @login_required
 def gen_game_map() -> AjaxData:
@@ -97,6 +106,7 @@ def gen_game_map() -> AjaxData:
             col = idx % width + 1
             raw_map[row][col] = 1
             mine_count -= 1
+            mine_idx.add(idx)
 
     # 计算每个格子周围地雷数
     for i in range(height):

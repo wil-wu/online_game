@@ -58,3 +58,14 @@ def test_register_validate_input(auth, username, password, confirm, message):
     """
     response = auth.register(username, password, confirm)
     assert response.json['msg'] == message
+
+
+def test_logout(auth, client):
+    """
+    测试登出
+    """
+    with client:
+        auth.login()
+        response = auth.logout()
+        assert response.headers['Location'] == '/auth'
+        assert session.get('user_id') is None

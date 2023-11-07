@@ -62,3 +62,6 @@ class AuthActions:
             'password': password,
             'confirm': confirm,
         })
+
+    def logout(self):
+        return self._client.get('/api/logout')

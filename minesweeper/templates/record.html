@@ -2,6 +2,12 @@
 {% block title %}记录{% endblock %}
 {% block main %}
   <main class="position-absolute top-50 start-50 translate-middle">
+    {% if g.user %}
+      <div class="d-flex align-items-center mb-3">
+        <div class="me-3">欢迎您，{{ g.user.username }}</div>
+        <a href="{{ url_for('views.game') }}" class="btn btn-light" data-mdb-ripple-color="dark">回到游戏</a>
+      </div>
+    {% endif %}
     <ul class="nav nav-tabs nav-fill mb-3" id="record-tabs">
       <li class="nav-item">
         <a class="nav-link" id="rank-tab" data-mdb-target="#rank-tab-pane">排行榜</a>
@@ -13,8 +19,8 @@
     <div class="tab-content" id="record-content">
       <div class="tab-pane fade" id="rank-tab-pane">
         <div class="input-group input-group-sm">
-          <input type="number" class="form-control" id="width" placeholder="宽" style="width: 80px"/>
-          <input type="number" class="form-control" id="height" placeholder="高" style="width: 80px"/>
+          <input type="number" class="form-control" id="width" placeholder="宽：默认为20" style="width: 80px"/>
+          <input type="number" class="form-control" id="height" placeholder="高：默认为20" style="width: 80px"/>
         </div>
         <table class="table">
           <thead>

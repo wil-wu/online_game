@@ -5,10 +5,16 @@
 {% endblock %}
 {% block main %}
   <main class="position-absolute top-50 start-50 translate-middle">
-    <div class="d-flex align-items-center mb-3 p-2 border rounded" style="background: var(--cell-hide-bg-color)">
+  {% if g.user %}
+    <div class="d-flex align-items-center mb-3">
+      <div class="me-3">欢迎您，{{ g.user.username }}</div>
+      <a class="btn btn-light" data-mdb-ripple-color="dark" href="{{ url_for('api.logout') }}">退出登录</a>
+    </div>
+  {% endif %}
+    <div class="d-flex align-items-center mb-3 p-2 rounded" style="background: var(--cell-hide-bg-color)">
       <div class="input-group input-group-sm">
-        <input type="number" class="form-control" id="width" placeholder="宽" style="width: 80px"/>
-        <input type="number" class="form-control" id="height" placeholder="高" style="width: 80px"/>
+        <input type="number" class="form-control" id="width" placeholder="宽：默认为20" style="width: 80px"/>
+        <input type="number" class="form-control" id="height" placeholder="高：默认为20" style="width: 80px"/>
         <button class="btn btn-outline-dark" id="game-btn">新游戏</button>
       </div>
       <div class="mx-5 d-flex align-items-center">
