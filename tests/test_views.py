@@ -1,24 +1,6 @@
 import pytest
 
 
-def test_auth_view(client):
-    """
-    验证视图测试
-    """
-
-
-def test_game_view(client, auth):
-    """
-    游戏视图测试
-    """
-
-
-def test_record_view(client, auth):
-    """
-    记录视图测试
-    """
-
-
 @pytest.mark.parametrize('path', (
     '/game',
     '/record',
@@ -37,13 +19,14 @@ def test_login_required_views(client, path):
     '/game',
     '/record',
 ))
-def test_csrf_token(client, auth, path):
+def test_views_and_csrf_token(client, auth, path):
     """
-    测试cookie写入csrftoken
+    测试模板响应和cookie中包含csrftoken
     """
     auth.login()
 
     response = client.get(path)
     cookie = response.headers.get('Set-Cookie')
+    assert response.status_code == 200
     assert cookie is not None
     assert 'csrftoken' in cookie

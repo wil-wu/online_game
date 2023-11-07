@@ -3,7 +3,7 @@ import pytest
 from minesweeper.models import db, Record
 
 
-def test_gen_game_map(client, auth):
+def test_gen_game_map(app, client, auth):
     """
     扫雷地图接口测试
     """
@@ -11,8 +11,20 @@ def test_gen_game_map(client, auth):
 
     response = client.get('/api/map')
     game_map = response.json['data']
+    # 地图宽高默认值
+    width = height = 10
+    expect_count = int(width * height * app.config['MINE_RATE'])
+    actual_count = 0
+
     assert game_map is not None
-    assert len(game_map) == 10 and len(game_map[0]) == 10
+    assert len(game_map) == height and len(game_map[0]) == width
+
+    # 测试地雷数量符合预期
+    for i in range(height):
+        for j in range(width):
+            actual_count += game_map[i][j] == 9
+
+    assert actual_count == expect_count
 
 
 @pytest.mark.parametrize(('width', 'height', 'message'), (
@@ -62,12 +74,12 @@ def test_game_history(app, client, auth):
 
 
 @pytest.mark.parametrize(('playtime', 'remainder', 'operation', 'width', 'height', 'game_map', 'message'), (
-    ('一', 1, '1', 1, 1, '1', '格式错误'),
-    (1, '一', '1', 1, 1, '1', '格式错误'),
-    (1, 1, '一', 1, 1, '1', '格式错误'),
-    (1, 1, '1', '一', 1, '1', '格式错误'),
-    (1, 1, '1', 1, '一', '1', '格式错误'),
-    (1, 1, '1', 1, 1, '一', '格式错误'),
+    ('一', 1, '1', 10, 10, '1', '格式错误'),
+    (1, '一', '1', 10, 10, '1', '格式错误'),
+    (1, 1, None, 10, 10, '1', '格式错误'),
+    (1, 1, '1', '一', 10, '1', '格式错误'),
+    (1, 1, '1', 10, '一', '1', '格式错误'),
+    (1, 1, '1', 10, 10, None, '格式错误'),
 ))
 def test_game_history_validate_input(client, auth, playtime, remainder, operation, width, height, game_map, message):
     """
