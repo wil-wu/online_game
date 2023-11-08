@@ -12,6 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const gameState = new Proxy({
         isReview: false,
         isOver: false,
+        willSave: false,
         timer: null,
         playdate: null,
         flags: 0,
@@ -72,6 +73,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 createMapUI(gameMap, m, n)
                 // 初始化配置
                 gameState.isOver = false
+                gameState.willSave = true
                 gameState.width = m
                 gameState.height = n
                 gameState.map = gameMap
@@ -89,6 +91,7 @@ window.addEventListener('DOMContentLoaded', () => {
             createMapUI(gameState.map, gameState.width, gameState.height)
             gameState.isReview = true
             gameState.isOver = false
+            gameState.willSave = false
             gameState.flags = Math.floor(gameState.width * gameState.height * _config.mineRate)
             gameState.current = 0
             gameState.remainder = gameState.width * gameState.height - gameState.flags
@@ -114,6 +117,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     // 初始化配置
                     gameState.isReview = true
                     gameState.isOver = false
+                    gameState.willSave = false
                     gameState.width = m
                     gameState.height = n
                     gameState.map = gameMap
@@ -144,7 +148,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         let [type, text] = gameState.remainder === 0 ? ['alert-success', '游戏成功'] : ['alert-warning', '游戏失败']
         alert.setType(type).setText(text).show()
-        if (!gameState.isReview) saveGame()
+        if (gameState.willSave) saveGame()
     }
 
     // 保存游戏记录
