@@ -1,8 +1,8 @@
-"""Initial migration
+"""initial migration
 
-Revision ID: ef1ba6b965bd
+Revision ID: a51078d088f9
 Revises: 
-Create Date: 2023-10-27 18:08:48.104552
+Create Date: 2023-11-08 10:14:26.019259
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ef1ba6b965bd'
+revision = 'a51078d088f9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,9 +27,10 @@ def upgrade():
     )
     op.create_table('record',
     sa.Column('record_id', sa.Integer(), nullable=False),
-    sa.Column('playtime', sa.Float(), nullable=False),
+    sa.Column('playdate', sa.DateTime(), nullable=False),
+    sa.Column('playtime', sa.Integer(), nullable=False),
     sa.Column('remainder', sa.Integer(), nullable=False),
-    sa.Column('process', sa.String(), nullable=False),
+    sa.Column('operation', sa.String(), nullable=False),
     sa.Column('width', sa.Integer(), nullable=False),
     sa.Column('height', sa.Integer(), nullable=False),
     sa.Column('map', sa.String(), nullable=False),
