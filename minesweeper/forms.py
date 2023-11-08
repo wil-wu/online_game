@@ -35,7 +35,7 @@ class RecordForm(FlaskForm):
     """
     playdate = DateTimeField('playdate', validators=[DataRequired()])
     playtime = IntegerField('playtime', validators=[DataRequired()])
-    remainder = IntegerField('remainder', validators=[DataRequired()])
+    remainder = IntegerField('remainder', validators=[NumberRange(0)])
     operation = StringField('operation', validators=[DataRequired()])
     width = IntegerField('width', validators=[DataRequired(), NumberRange(10, 100)])
     height = IntegerField('height', validators=[DataRequired(), NumberRange(10, 100)])
