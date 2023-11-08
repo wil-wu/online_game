@@ -290,12 +290,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 插旗
     const rightClick = (i, j) => {
-        if (gameState.flags === 0) {
-            return
-        }
         let cell = cellContainer.children[i].children[j]
         let state = cell.dataset.state
         if (state === 'hidden') {
+            if (gameState.flags === 0) return
             cell.classList.add('cell-10')
             cell.dataset.state = 'flagged'
             gameState.flags -= 1
