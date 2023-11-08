@@ -1,6 +1,7 @@
 import random
 
 from flask import Blueprint, request, url_for, redirect, session, g, current_app
+from sqlalchemy import desc
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from minesweeper.forms import LoginForm, RegisterForm, SpecForm, RecordForm
@@ -135,7 +136,10 @@ def game_history() -> AjaxData:
         return AjaxData(msg='已保存游戏记录')
 
     max_per_page = current_app.config['MAX_PER_PAGE']
-    pagination = Record.query.filter_by(user_id=g.user.user_id).paginate(max_per_page=max_per_page, error_out=False)
+    pagination = Record.query.filter_by(user_id=g.user.user_id).order_by(desc('playdate')).paginate(
+        max_per_page=max_per_page,
+        error_out=False
+    )
     return AjaxData(data={'pages': pagination.pages, 'items': pagination.items})
 
 
