@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass, Mapped, mapped_column, relationship
 
 
@@ -24,6 +26,7 @@ class Record(db.Model):
     记录模型
     """
     record_id: Mapped[int] = mapped_column(Integer, init=False, primary_key=True)
+    playdate: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     playtime: Mapped[int] = mapped_column(Integer, nullable=False)
     remainder: Mapped[int] = mapped_column(Integer, nullable=False)
     operation: Mapped[str] = mapped_column(String, nullable=False)

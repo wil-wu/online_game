@@ -66,6 +66,7 @@
                               <td>${datum.width} x ${datum.height}</td>
                               <td>${datum.remainder}</td>
                               <td>${domutil.millisecondFormat(datum.playtime)}</td>
+                              <td>${new Date(datum.playdate + '+8').toLocaleString()}</td>
                             </tr>`
                 view += html
             }
@@ -82,6 +83,7 @@
                               <td>${datum.width} x ${datum.height}</td>
                               <td>${datum.remainder}</td>
                               <td>${domutil.millisecondFormat(datum.playtime)}</td>
+                              <td>${new Date(datum.playdate + '+8').toLocaleString()}</td>
                             </tr>`
                 view += html
             }

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from flask.testing import FlaskClient
 from werkzeug.test import TestResponse
@@ -17,8 +19,10 @@ def app():
         user2 = User(username='test2', password=generate_password_hash('password'))
         db.session.add_all((user1, user2))
         db.session.commit()
-        record1 = Record(playtime=1, remainder=1, operation='1', width=10, height=10, map='1', user_id=user1.user_id)
-        record2 = Record(playtime=2, remainder=2, operation='2', width=10, height=10, map='2', user_id=user2.user_id)
+        record1 = Record(playdate=datetime.now(),
+                         playtime=1, remainder=1, operation='1', width=10, height=10, map='1', user_id=user1.user_id)
+        record2 = Record(playdate=datetime.now(),
+                         playtime=2, remainder=2, operation='2', width=10, height=10, map='2', user_id=user2.user_id)
         db.session.add_all((record1, record2))
         db.session.commit()
 

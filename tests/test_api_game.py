@@ -58,6 +58,7 @@ def test_game_history(app, client, auth):
     assert len(data['items']) <= app.config['MAX_PER_PAGE']
 
     response = client.post('/api/history', json={
+        'playdate': '2023-11-11 11:11:11',
         'playtime': 3,
         'remainder': 3,
         'operation': '3',
@@ -73,21 +74,29 @@ def test_game_history(app, client, auth):
         assert record.user_id == 1
 
 
-@pytest.mark.parametrize(('playtime', 'remainder', 'operation', 'width', 'height', 'game_map', 'message'), (
-    ('一', 1, '1', 10, 10, '1', '格式错误'),
-    (1, '一', '1', 10, 10, '1', '格式错误'),
-    (1, 1, None, 10, 10, '1', '格式错误'),
-    (1, 1, '1', '一', 10, '1', '格式错误'),
-    (1, 1, '1', 10, '一', '1', '格式错误'),
-    (1, 1, '1', 10, 10, None, '格式错误'),
+@pytest.mark.parametrize(('playdate', 'playtime', 'remainder', 'operation', 'width', 'height', 'game_map', 'message'), (
+    ('一', '1', 1, '1', 10, 10, '1', '格式错误'),
+    ('2023-11-11 11:11:11', 1, '一', '1', 10, 10, '1', '格式错误'),
+    ('2023-11-11 11:11:11', 1, 1, None, 10, 10, '1', '格式错误'),
+    ('2023-11-11 11:11:11', 1, 1, '1', '一', 10, '1', '格式错误'),
+    ('2023-11-11 11:11:11', 1, 1, '1', 10, '一', '1', '格式错误'),
+    ('2023-11-11 11:11:11', 1, 1, '1', 10, 10, None, '格式错误'),
+    ('2023-11-11 11:11:11', '一', 1, '1', 10, 10, '1', '格式错误'),
+    ('2023-11-11 11:11:11', 1, '一', '1', 10, 10, '1', '格式错误'),
+    ('2023-11-11 11:11:11', 1, 1, None, 10, 10, '1', '格式错误'),
+    ('2023-11-11 11:11:11', 1, 1, '1', '一', 10, '1', '格式错误'),
+    ('2023-11-11 11:11:11', 1, 1, '1', 10, '一', '1', '格式错误'),
+    ('2023-11-11 11:11:11', 1, 1, '1', 10, 10, None, '格式错误'),
 ))
-def test_game_history_validate_input(client, auth, playtime, remainder, operation, width, height, game_map, message):
+def test_game_history_validate_input(client, auth,
+                                     playdate, playtime, remainder, operation, width, height, game_map, message):
     """
     游戏记录参数合法性测试
     """
     auth.login()
 
     response = client.post('/api/history', json={
+        'playdate': playdate,
         'playtime': playtime,
         'remainder': remainder,
         'operation': operation,

@@ -13,6 +13,7 @@ window.addEventListener('DOMContentLoaded', () => {
         isReview: false,
         isOver: false,
         timer: null,
+        playdate: null,
         flags: 0,
         current: 0,
         remainder: 0,
@@ -149,6 +150,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // 保存游戏记录
     const saveGame = () => {
         request.post(_api.history, {
+            playdate: gameState.playdate,
             playtime: gameState.current,
             remainder: gameState.remainder,
             width: gameState.width,
@@ -303,6 +305,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 开启计时器
     const startTimer = () => {
+        gameState.playdate = new Date().toLocaleString().replaceAll('/', '-')
         gameState.timer = setInterval(() => gameState.current += 16, 16)
     }
 
