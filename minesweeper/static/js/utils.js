@@ -186,7 +186,7 @@
             this._created = true
             this._page = pager.page
             this._perPage = pager.perPage
-            this._pages = pager.pages
+            this._pages = Math.min(pager.pages, Math.ceil(_config.maxTotal / pager.perPage))
             this._element = document.querySelector(selector)
             this._callback = callback
             this._paginate = (evt) => {
