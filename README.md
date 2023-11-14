@@ -3,21 +3,21 @@
 ### 本地运行
 创建虚拟环境
 ```
-> python -m venv venv
+python -m venv venv
 ```
 激活虚拟环境
 ```
-> ./venv/scripts/activate
+./venv/scripts/activate
 ```
 安装依赖
 ```
-> pip install -r requirements
+pip install -r requirements
 ```
 数据库迁移
 ```
-> flask --app minesweeper db upgrade
+flask --app minesweeper db upgrade
 ```
 启动本地服务
 ```
-> flask --app minesweeper run --debug
+flask --app minesweeper run --debug
 ```
