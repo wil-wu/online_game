@@ -2,18 +2,22 @@ window.addEventListener('DOMContentLoaded', () => {
     'use strict'
 
     let cellContainer = document.querySelector('.cell-container')
+    let rateBtn = document.querySelector('#rate-btn')
     let gameBtn = document.querySelector('#game-btn')
     let reviewBtn = document.querySelector('#review-btn')
     let timer = document.querySelector('#timer')
     let flags = document.querySelector('#flags')
+    let progressBar = document.querySelector('#progress-bar')
 
     const alert = new mdb.Alert('#alert')
 
     const gameState = new Proxy({
         isReview: false,
         isOver: false,
+        toggling: false,
         timer: null,
         playdate: null,
+        rate: 1,
         flags: 0,
         current: 0,
         remainder: 0,
@@ -26,7 +30,11 @@ window.addEventListener('DOMContentLoaded', () => {
             target[p] = newValue
 
             if (p === 'current') {
-                timer.textContent = Math.floor(newValue / 1000)
+                let sec = Math.floor(newValue / 1000)
+                timer.textContent = sec
+                if (target.isReview) progressBar.value = sec
+            } else if (p === 'rate') {
+                rateBtn.firstElementChild.textContent = `x${newValue}`
             } else if (p === 'flags') {
                 flags.textContent = newValue
             } else if (p === 'isOver') {
@@ -35,9 +43,15 @@ window.addEventListener('DOMContentLoaded', () => {
             } else if (p === 'isReview') {
                 gameBtn.disabled = newValue
                 reviewBtn.disabled = newValue
+                progressBar.disabled = !newValue
             }
             return true
         }
+    })
+
+    // 回放速度
+    rateBtn.addEventListener('click', () => {
+        gameState.rate = gameState.rate % 5 + 1
     })
 
     // 重开游戏
@@ -87,6 +101,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const setupReview = () => {
         if (gameState.operation.length) {
             createMapUI(gameState.map, gameState.width, gameState.height)
+            progressBar.max = Math.floor(gameState.operation[gameState.operation.length - 1][0] / 1000)
+
             gameState.isReview = true
             gameState.isOver = false
             gameState.flags = Math.floor(gameState.width * gameState.height * _config.mineRate)
@@ -111,6 +127,8 @@ window.addEventListener('DOMContentLoaded', () => {
                     const [m, n] = [gameMap.length, gameMap[0].length]
 
                     createMapUI(gameMap, m, n)
+                    progressBar.max = Math.floor(operation[operation.length - 1][0] / 1000)
+
                     // 初始化配置
                     gameState.isReview = true
                     gameState.isOver = false
@@ -141,6 +159,7 @@ window.addEventListener('DOMContentLoaded', () => {
         clearInterval(gameState.timer)
         cellContainer.removeEventListener('mouseup', startTimer)
         cellContainer.removeEventListener('mouseup', startPlay)
+        progressBar.removeEventListener('input', speedup)
 
         let [type, text] = gameState.remainder === 0 ? ['alert-success', '游戏成功'] : ['alert-warning', '游戏失败']
         alert.setType(type).setText(text).show()
@@ -162,9 +181,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 回放游戏
     const reviewGame = () => {
+        progressBar.addEventListener('input', speedup)
+
         let index = 0
         gameState.timer = setInterval(() => {
-            gameState.current += 16
+            if (gameState.toggling) return
+            gameState.current += 16 * gameState.rate
             let action = gameState.operation[index]
             if (gameState.current >= action[0]) {
                 switch (action[3]) {
@@ -200,6 +222,16 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             cellContainer.append(cellRow)
         }
+    }
+
+    // 快进回放(禁止倒退)
+    const speedup = (evt) => {
+        let curr = parseInt(evt.target.value)
+        if (curr <= Math.floor(gameState.current / 1000)) return
+
+        gameState.toggling = true
+        gameState.current = curr * 1000
+        gameState.toggling = false
     }
 
     // 游戏区域操作

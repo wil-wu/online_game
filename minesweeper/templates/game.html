@@ -11,7 +11,7 @@
       <a class="btn btn-light" data-mdb-ripple-color="dark" href="{{ url_for('api.logout') }}">退出登录</a>
     </div>
   {% endif %}
-    <div class="d-flex align-items-center mb-3 p-2 rounded" style="background: var(--cell-hide-bg-color)">
+    <div class="d-flex align-items-center mb-2 p-2 rounded" style="background: var(--cell-hide-bg-color)">
       <div class="input-group input-group-sm">
         <input type="number" class="form-control" id="width" placeholder="宽：默认为20" style="width: 80px"/>
         <input type="number" class="form-control" id="height" placeholder="高：默认为20" style="width: 80px"/>
@@ -23,12 +23,17 @@
         <div class="ms-3 d-flex align-items-center"><i class="fa-solid fa-clock"></i><span class="ms-2" id="timer">000</span>s</div>
       </div>
       <div class="d-flex align-items-center">
+        <button type="button" id="rate-btn" class="btn btn-sm btn-outline-dark" data-mdb-toggle="tooltip" title="速度">
+          <i class="fa-solid">x1</i></button>
         <button type="button" id="review-btn" class="btn btn-sm btn-outline-dark" data-mdb-toggle="tooltip" title="回放"><i
           class="fa-solid fa-clock-rotate-left"></i></button>
         <a href="{{ url_for('views.record') }}" id="rank-btn" class="btn btn-sm btn-outline-dark" data-mdb-toggle="tooltip" title="记录"><i
           class="fa-solid fa-ranking-star"></i>
         </a>
       </div>
+    </div>
+    <div class="range mb-2">
+      <input type="range" class="form-range" id="progress-bar" disabled />
     </div>
     <div class="text-center">
       <div class="cell-container d-inline-block"></div>
