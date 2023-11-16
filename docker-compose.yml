@@ -1,0 +1,8 @@
+version: "1.0"
+
+services:
+  minesweeper:
+    build: .
+    command: flask --app minesweeper run --host=0.0.0.0
+    ports:
+      - "5000:5000"
